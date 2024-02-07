@@ -6,72 +6,82 @@ import { reactive, watch } from 'vue'
 
 const props = defineProps(['containerSize', 'loads'])
 
-let CONTAINER_SIZE = props.containerSize
-let loads = props.loads
-watch(() => {
-  CONTAINER_SIZE = props.containerSize
-  loads = props.loads
-})
-console.log(CONTAINER_SIZE, loads)
+let CONTAINER_SIZE = { width: 0, height: 0, depth: 0 }
+let loads = []
+let loadLines = []
+let lines = []
 
-//Container
-const containerVertices = [
-      [0,0,0],
-      [CONTAINER_SIZE.width,0,0],
-      [CONTAINER_SIZE.width,CONTAINER_SIZE.height,0],
-      [0,CONTAINER_SIZE.height,0],
-      [0,0,CONTAINER_SIZE.depth],
-      [CONTAINER_SIZE.width,0,CONTAINER_SIZE.depth],
-      [CONTAINER_SIZE.width,CONTAINER_SIZE.height,CONTAINER_SIZE.depth],
-      [0,CONTAINER_SIZE.height,CONTAINER_SIZE.depth]
-    ]
+const getLines = () => {
+  //Container
+  let containerVertices = [
+        [0,0,0],
+        [CONTAINER_SIZE.width,0,0],
+        [CONTAINER_SIZE.width,CONTAINER_SIZE.height,0],
+        [0,CONTAINER_SIZE.height,0],
+        [0,0,CONTAINER_SIZE.depth],
+        [CONTAINER_SIZE.width,0,CONTAINER_SIZE.depth],
+        [CONTAINER_SIZE.width,CONTAINER_SIZE.height,CONTAINER_SIZE.depth],
+        [0,CONTAINER_SIZE.height,CONTAINER_SIZE.depth]
+      ]
 
-const containerVerticesEdges = [
-  [0, 1], [1, 2], [2, 3], [3, 0],
-  [4, 5], [5, 6], [6, 7], [7, 4],
-  [0, 4], [1, 5], [2, 6], [3, 7]
-]
-
-const lines = reactive(containerVerticesEdges.map(([startIdx, endIdx]) => {
-  const start = containerVertices[startIdx]
-  const end = containerVertices[endIdx]
-  return {
-    start: new THREE.Vector3(...start),
-    end: new THREE.Vector3(...end)
-  }
-}))
-
-//Loads
-//const loads = []
-
-const loadLines = reactive(loads.map(load => {
-  const vertices = [
-    [load.ini_x, load.ini_y, load.ini_z],
-    [load.fin_x, load.ini_y, load.ini_z],
-    [load.fin_x, load.fin_y, load.ini_z],
-    [load.ini_x, load.fin_y, load.ini_z],
-    [load.ini_x, load.ini_y, load.fin_z],
-    [load.fin_x, load.ini_y, load.fin_z],
-    [load.fin_x, load.fin_y, load.fin_z],
-    [load.ini_x, load.fin_y, load.fin_z],
-  ]
-
-  const edges = [
+  let containerVerticesEdges = [
     [0, 1], [1, 2], [2, 3], [3, 0],
     [4, 5], [5, 6], [6, 7], [7, 4],
     [0, 4], [1, 5], [2, 6], [3, 7]
   ]
 
-  return edges.map(([startIdx, endIdx]) => {
-    const start = vertices[startIdx]
-    const end = vertices[endIdx]
+  let lines = reactive(containerVerticesEdges.map(([startIdx, endIdx]) => {
+    let start = containerVertices[startIdx]
+    let end = containerVertices[endIdx]
     return {
       start: new THREE.Vector3(...start),
       end: new THREE.Vector3(...end)
     }
-  })
-}))
-  
+  }))
+
+  return lines
+}
+
+const getLoadLines = () => {
+  //Loads
+  let loadLines = reactive(loads.map(load => {
+    let vertices = [
+      [load.ini_x, load.ini_y, load.ini_z],
+      [load.fin_x, load.ini_y, load.ini_z],
+      [load.fin_x, load.fin_y, load.ini_z],
+      [load.ini_x, load.fin_y, load.ini_z],
+      [load.ini_x, load.ini_y, load.fin_z],
+      [load.fin_x, load.ini_y, load.fin_z],
+      [load.fin_x, load.fin_y, load.fin_z],
+      [load.ini_x, load.fin_y, load.fin_z],
+    ]
+
+    let edges = [
+      [0, 1], [1, 2], [2, 3], [3, 0],
+      [4, 5], [5, 6], [6, 7], [7, 4],
+      [0, 4], [1, 5], [2, 6], [3, 7]
+    ]
+
+    return edges.map(([startIdx, endIdx]) => {
+      let start = vertices[startIdx]
+      let end = vertices[endIdx]
+      return {
+        start: new THREE.Vector3(...start),
+        end: new THREE.Vector3(...end)
+      }
+    })
+  }))
+  return loadLines
+}
+
+watch(() => {
+  CONTAINER_SIZE.width = 0
+  CONTAINER_SIZE = props.containerSize
+  loads = props.loads
+  loadLines = getLoadLines()
+  lines = getLines()
+})
+
 </script>
 
 <script>
@@ -86,32 +96,39 @@ const getRandomColor = () => {
 </script>
 
 <template>
-  <TresCanvas clear-color="#ffffff" window-size>
-    <TresPerspectiveCamera :position="[CONTAINER_SIZE.width + 20, CONTAINER_SIZE.height + 10, CONTAINER_SIZE.depth + 40]"/>
-    <MapControls />
+  <template v-if="CONTAINER_SIZE.width > 0">
+    <TresCanvas clear-color="#ffffff" window-size>
+      <TresPerspectiveCamera :position="[CONTAINER_SIZE.width + 20, CONTAINER_SIZE.height + 10, CONTAINER_SIZE.depth + 40]"/>
+      <MapControls />
 
-    <TresMesh :position="[CONTAINER_SIZE.width / 2, CONTAINER_SIZE.height / 2, CONTAINER_SIZE.depth / 2]">
-      <TresBoxGeometry :args="[CONTAINER_SIZE.width, CONTAINER_SIZE.height, CONTAINER_SIZE.depth]"/>
-      <TresMeshBasicMaterial :color="'#808080'" :opacity="0.5" :transparent="true" :side="THREE.DoubleSide" :depthTest="false" />   
-    </TresMesh>
-
-    <template v-for="(line, index) in lines" :key="index">
-      <Line2 :points="[line.start.toArray(), line.end.toArray()]" :line-width="2" color="#5A5A5A" />
-    </template>
-
-    <template v-for="(load, index) in loads" :key="index">
-      <TresMesh :position="[(load.ini_x + load.fin_x) / 2, (load.ini_y + load.fin_y) / 2, (load.ini_z + load.fin_z) / 2]">
-        <TresBoxGeometry :args="[load.fin_x - load.ini_x, load.fin_y - load.ini_y, load.fin_z - load.ini_z]"/>
-        <TresMeshBasicMaterial :color="getRandomColor()" :opacity="0.8" :transparent="true"/>
+      <TresMesh :position="[CONTAINER_SIZE.width / 2, CONTAINER_SIZE.height / 2, CONTAINER_SIZE.depth / 2]">
+        <TresBoxGeometry :args="[CONTAINER_SIZE.width, CONTAINER_SIZE.height, CONTAINER_SIZE.depth]"/>
+        <TresMeshBasicMaterial :color="'#808080'" :opacity="0.5" :transparent="true" :side="THREE.DoubleSide" :depthTest="false" />   
       </TresMesh>
 
-      <template v-for="(loadLine, idx) in loadLines[index]" :key="idx">
-        <Line2 :points="[loadLine.start.toArray(), loadLine.end.toArray()]" :line-width="2" color="#000000" />
+      <template v-for="(line, index) in lines" :key="index">
+        <Line2 :points="[line.start.toArray(), line.end.toArray()]" :line-width="2" color="#5A5A5A" />
       </template>
-    </template>
 
-    <TresGridHelper :args="[CONTAINER_SIZE.depth * 2, CONTAINER_SIZE.width]" />
-  </TresCanvas>
+      <template v-for="(load, index) in loads" :key="index">
+        <TresMesh :position="[(load.ini_x + load.fin_x) / 2, (load.ini_y + load.fin_y) / 2, (load.ini_z + load.fin_z) / 2]">
+          <TresBoxGeometry :args="[load.fin_x - load.ini_x, load.fin_y - load.ini_y, load.fin_z - load.ini_z]"/>
+          <TresMeshBasicMaterial :color="getRandomColor()" :opacity="0.8" :transparent="true"/>
+        </TresMesh>
+
+        <template v-for="(loadLine, idx) in loadLines[index]" :key="idx">
+          <Line2 :points="[loadLine.start.toArray(), loadLine.end.toArray()]" :line-width="2" color="#000000" />
+        </template>
+      </template>
+
+      <TresGridHelper :args="[CONTAINER_SIZE.depth * 2, CONTAINER_SIZE.width]" />
+    </TresCanvas>
+  </template>
+
+  <template v-else>
+    aaaaaaaa
+  </template>
+
 </template>
 
 <style>

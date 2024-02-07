@@ -11,7 +11,6 @@ const loads = ref([])
 function handleFileLoaded(data){
   containerSize.value = data.containerSize
   loads.value = data.loads
-  console.log(containerSize.value, loads.value)
 }
 </script>
 
