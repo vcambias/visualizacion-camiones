@@ -2,9 +2,10 @@
 import { TresCanvas } from '@tresjs/core'
 import {MapControls, Line2} from '@tresjs/cientos'
 import * as THREE from 'three'
-import { reactive, watch } from 'vue'
+import { reactive, watch, defineEmits } from 'vue'
 
 const props = defineProps(['containerSize', 'loads'])
+const emits = defineEmits()
 
 let CONTAINER_SIZE = { width: 0, height: 0, depth: 0 }
 let loads = []
@@ -82,6 +83,9 @@ watch(() => {
   lines = getLines()
 })
 
+const handleLoadClick = (load) => {
+  emits('load-clicked', {loadClicked: load})
+}
 </script>
 
 <script>
@@ -111,7 +115,9 @@ const getRandomColor = () => {
       </template>
 
       <template v-for="(load, index) in loads" :key="index">
-        <TresMesh :position="[(load.ini_x + load.fin_x) / 2, (load.ini_y + load.fin_y) / 2, (load.ini_z + load.fin_z) / 2]">
+        <TresMesh :position="[(load.ini_x + load.fin_x) / 2, (load.ini_y + load.fin_y) / 2, (load.ini_z + load.fin_z) / 2]"
+        @click="() => handleLoadClick(load)"
+        :originalColor="load.originalColor">
           <TresBoxGeometry :args="[load.fin_x - load.ini_x, load.fin_y - load.ini_y, load.fin_z - load.ini_z]"/>
           <TresMeshBasicMaterial :color="getRandomColor()" :opacity="0.8" :transparent="true"/>
         </TresMesh>
@@ -126,7 +132,9 @@ const getRandomColor = () => {
   </template>
 
   <template v-else>
-    aaaaaaaa
+    <div id="message">
+      Nothing to see. Load file to continue.
+    </div>
   </template>
 
 </template>
@@ -142,5 +150,10 @@ body {
 #app {
   height: 100%;
   width: 100%;
+}
+#message{
+  font-family: monospace;
+  display: flex;
+  justify-content: center;
 }
 </style>
