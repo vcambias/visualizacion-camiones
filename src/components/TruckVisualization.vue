@@ -2,15 +2,17 @@
 import { TresCanvas } from '@tresjs/core'
 import {MapControls, Line2} from '@tresjs/cientos'
 import * as THREE from 'three'
-import { reactive, watch, defineEmits } from 'vue'
+import { reactive, watch, defineEmits, watchEffect } from 'vue'
+import { ref } from 'vue'
 
 const props = defineProps(['containerSize', 'loads'])
 const emits = defineEmits()
 
-let CONTAINER_SIZE = { width: 0, height: 0, depth: 0 }
-let loads = []
+let CONTAINER_SIZE = reactive({ width: 0, height: 0, depth: 0 })
+let loads = reactive([])
 let loadLines = []
 let lines = []
+const render = ref(true);
 
 const getLines = () => {
   //Container
@@ -75,10 +77,9 @@ const getLoadLines = () => {
   return loadLines
 }
 
-watch(() => {
-  CONTAINER_SIZE.width = 0
+watchEffect(() => {
   CONTAINER_SIZE = props.containerSize
-  loads = props.loads
+  loads = [...props.loads]
   loadLines = getLoadLines()
   lines = getLines()
 })
@@ -133,7 +134,7 @@ const getRandomColor = () => {
 
   <template v-else>
     <div id="message">
-      Nothing to see. Load file to continue.
+      Nothing to see. Load file and select trip to continue.
     </div>
   </template>
 

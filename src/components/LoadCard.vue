@@ -22,7 +22,8 @@ export default {
 <template>
   <div class="card" id="LoadCard">
     <div v-if="loadData">
-      <div>{{ loadData.label }}</div>
+      <div>Material {{ loadData.label }}</div>
+      <div>Storage: {{ loadData.storage }}</div>
     </div>
 
     <div v-else>

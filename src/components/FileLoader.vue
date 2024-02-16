@@ -1,11 +1,11 @@
 <script setup>
 import { ref, defineEmits } from 'vue'
+import * as TruckSizes from '../data/TruckSizes.js'
+import * as Trips from '../data/Trips.js'
 
 const emits = defineEmits()
 
 const fileInput = ref(null)
-const containerSize = ref({ width: 0, height: 0, depth: 0 })
-const loads = ref([])
 
 const openFileExplorer = () => {
   fileInput.value.click()
@@ -31,29 +31,54 @@ const readFile = (file) => {
 
 const processData = (data) => {
   const lines = data.split('\n')
-  // Obtener medidas del contenedor
-  const containerLine = lines.shift().trim().split(',')
-  containerSize.value = {
-    width: parseFloat(containerLine[0]),
-    height: parseFloat(containerLine[1]),
-    depth: parseFloat(containerLine[2])
+  let currentContainerLoads = []
+  let currentTripId = 0
+  let lastTripId = 0
+  let currentTruckSizes = { width: 0, height: 0, depth: 0 }
+  let lastTruckSizes = { width: 0, height: 0, depth: 0 }
+  
+  for(const line of lines){
+    const loadInfo = line.trim().split(';');
+
+    lastTripId = currentTripId;
+    currentTripId = loadInfo[9];
+    lastTruckSizes = currentTruckSizes;
+    currentTruckSizes = TruckSizes.truckSizes[loadInfo[8]];
+    
+    if(loadInfo[1] === '0' && loadInfo[2] === '0' && loadInfo[3] === '0'){
+      if(currentContainerLoads.length > 0){
+        const trip = {
+          tripId: parseFloat(lastTripId),
+          containerSize: lastTruckSizes,
+          loads: currentContainerLoads
+        }
+
+        Trips.addTrip(trip);
+        currentContainerLoads = []
+      }
+    }
+
+    const load = {
+        label: loadInfo[0],
+        ini_x: parseFloat(loadInfo[1])/100,
+        ini_y: parseFloat(loadInfo[2])/100,
+        ini_z: parseFloat(loadInfo[3])/100,
+        fin_x: parseFloat(loadInfo[4])/100,
+        fin_y: parseFloat(loadInfo[5])/100,
+        fin_z: parseFloat(loadInfo[6])/100,
+        storage: loadInfo[7]
+      };
+
+    currentContainerLoads.push(load)
   }
 
-  // Obtener información de las cargas
-  loads.value = lines.map(line => {
-    const loadInfo = line.trim().split(',')
-    return {
-      label: loadInfo[0],
-      ini_x: parseFloat(loadInfo[1]),
-      ini_y: parseFloat(loadInfo[2]),
-      ini_z: parseFloat(loadInfo[3]),
-      fin_x: parseFloat(loadInfo[4]),
-      fin_y: parseFloat(loadInfo[5]),
-      fin_z: parseFloat(loadInfo[6])
-    }
-  })
+  const trip = {
+    tripId: parseFloat(lastTripId),
+    containerSize: lastTruckSizes,
+    loads: currentContainerLoads
+  }
 
-  emits('file-loaded', { containerSize: containerSize.value, loads: loads.value })
+  Trips.addTrip(trip);
 }
 </script>
 
