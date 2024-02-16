@@ -3,17 +3,17 @@ import { ref, watch } from 'vue'
 
 export default {
   props: {
-    containerSize: Object
+    tripData: Object
   },
   setup(props) {
-    const truckData = ref(null)
+    const tripData = ref(null)
 
     watch(() => {
-      truckData.value = props.containerSize
+      tripData.value = props.tripData
     })
 
     return {
-      truckData
+      tripData
     }
   }
 }
@@ -21,11 +21,19 @@ export default {
 
 <template>
   <div class="card" id="TruckCard">
-    <div v-if="truckData.width > 0">
-      <div>Truck Size</div>
-      <div>Width: {{ truckData.width }}</div>
-      <div>Height: {{ truckData.height }}</div>
-      <div>Length: {{ truckData.depth }}</div>
+    <div v-if="tripData.value.clients.length > 0">
+      <div>Trip N° {{ tripData.value.tripId }}</div>
+      <div>Truck Type: {{ tripData.value.truckType }}</div>
+      <div>Total Weight: {{ tripData.value.totalWeight }}</div>
+      <div>Clients:</div>
+      <ul>
+        <li v-for="client in tripData.value.clients" :key="client.clientName">
+          <svg width="10" height="10">
+            <circle cx="5" cy="5" r="3" :fill="client.clientColor" />
+          </svg> 
+          {{ client.clientName }}
+        </li>
+      </ul>
     </div>
 
     <div v-else>

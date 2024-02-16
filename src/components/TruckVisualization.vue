@@ -2,7 +2,7 @@
 import { TresCanvas } from '@tresjs/core'
 import {MapControls, Line2} from '@tresjs/cientos'
 import * as THREE from 'three'
-import { reactive, watch, defineEmits, watchEffect } from 'vue'
+import { reactive, defineEmits, watchEffect } from 'vue'
 import { ref } from 'vue'
 
 const props = defineProps(['containerSize', 'loads'])
@@ -12,7 +12,7 @@ let CONTAINER_SIZE = reactive({ width: 0, height: 0, depth: 0 })
 let loads = reactive([])
 let loadLines = []
 let lines = []
-const render = ref(true);
+let selectedLoad = ref(null)
 
 const getLines = () => {
   //Container
@@ -85,19 +85,20 @@ watchEffect(() => {
 })
 
 const handleLoadClick = (load) => {
+  selectedLoad.value = load
   emits('load-clicked', {loadClicked: load})
 }
 </script>
 
 <script>
-const getRandomColor = () => {
-  const letters = '0123456789ABCDEF'
-  let color = '#'
-  for (let i = 0; i < 6; i++) {
-    color += letters[Math.floor(Math.random() * 16)]
-  }
-  return color
-}
+// const getRandomColor = () => {
+//   const letters = '0123456789ABCDEF'
+//   let color = '#'
+//   for (let i = 0; i < 6; i++) {
+//     color += letters[Math.floor(Math.random() * 16)]
+//   }
+//   return color
+// }
 </script>
 
 <template>
@@ -108,7 +109,7 @@ const getRandomColor = () => {
 
       <TresMesh :position="[CONTAINER_SIZE.width / 2, CONTAINER_SIZE.height / 2, CONTAINER_SIZE.depth / 2]">
         <TresBoxGeometry :args="[CONTAINER_SIZE.width, CONTAINER_SIZE.height, CONTAINER_SIZE.depth]"/>
-        <TresMeshBasicMaterial :color="'#808080'" :opacity="0.5" :transparent="true" :side="THREE.DoubleSide" :depthTest="false" />   
+        <TresMeshBasicMaterial :color="'#808080'" :opacity="0.25" :transparent="true" :side="THREE.DoubleSide" :depthTest="false" />   
       </TresMesh>
 
       <template v-for="(line, index) in lines" :key="index">
@@ -120,7 +121,7 @@ const getRandomColor = () => {
         @click="() => handleLoadClick(load)"
         :originalColor="load.originalColor">
           <TresBoxGeometry :args="[load.fin_x - load.ini_x, load.fin_y - load.ini_y, load.fin_z - load.ini_z]"/>
-          <TresMeshBasicMaterial :color="getRandomColor()" :opacity="0.8" :transparent="true"/>
+          <TresMeshBasicMaterial :color="load.color" :opacity="0.8" :transparent="true"/>
         </TresMesh>
 
         <template v-for="(loadLine, idx) in loadLines[index]" :key="idx">

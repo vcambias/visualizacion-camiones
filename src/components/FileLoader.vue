@@ -4,7 +4,7 @@ import * as TruckSizes from '../data/TruckSizes.js'
 import * as Trips from '../data/Trips.js'
 
 const emits = defineEmits()
-
+const clientColors = {}
 const fileInput = ref(null)
 
 const openFileExplorer = () => {
@@ -32,10 +32,15 @@ const readFile = (file) => {
 const processData = (data) => {
   const lines = data.split('\n')
   let currentContainerLoads = []
+  let currentContainerWeight = 0
+  let currentContainerClients = []
+
   let currentTripId = 0
   let lastTripId = 0
   let currentTruckSizes = { width: 0, height: 0, depth: 0 }
   let lastTruckSizes = { width: 0, height: 0, depth: 0 }
+  let currentTruckName = ""
+  let lastTruckName = ""
   
   for(const line of lines){
     const loadInfo = line.trim().split(';');
@@ -44,17 +49,24 @@ const processData = (data) => {
     currentTripId = loadInfo[9];
     lastTruckSizes = currentTruckSizes;
     currentTruckSizes = TruckSizes.truckSizes[loadInfo[8]];
+    lastTruckName = currentTruckName;
+    currentTruckName = loadInfo[8];
     
     if(loadInfo[1] === '0' && loadInfo[2] === '0' && loadInfo[3] === '0'){
       if(currentContainerLoads.length > 0){
         const trip = {
           tripId: parseFloat(lastTripId),
           containerSize: lastTruckSizes,
-          loads: currentContainerLoads
+          clients: currentContainerClients,
+          weight: currentContainerWeight,
+          loads: currentContainerLoads,
+          truckName: lastTruckName
         }
 
         Trips.addTrip(trip);
         currentContainerLoads = []
+        currentContainerClients = []
+        currentContainerWeight = 0
       }
     }
 
@@ -66,19 +78,48 @@ const processData = (data) => {
         fin_x: parseFloat(loadInfo[4])/100,
         fin_y: parseFloat(loadInfo[5])/100,
         fin_z: parseFloat(loadInfo[6])/100,
-        storage: loadInfo[7]
+        storage: loadInfo[7],
+        client: loadInfo[10],
+        order: loadInfo[11],
+        fragility: loadInfo[12],
+        prod_type: loadInfo[13],
+        locality: loadInfo[14],
+        distance: loadInfo[15],
+        weight: parseFloat(loadInfo[16]),
+        color: getClientColor(loadInfo[10]),
       };
 
+    currentContainerWeight += load.weight
+    currentContainerClients.some((client) => client.clientName === load.client) || currentContainerClients.push({clientName: load.client, clientColor: getClientColor(load.client)})
     currentContainerLoads.push(load)
   }
 
   const trip = {
     tripId: parseFloat(lastTripId),
     containerSize: lastTruckSizes,
-    loads: currentContainerLoads
+    clients: currentContainerClients,
+    weight: currentContainerWeight,
+    loads: currentContainerLoads,
+    truckName: lastTruckName
   }
 
   Trips.addTrip(trip);
+}
+
+const getClientColor = (client) => {
+  if (!clientColors[client]) {
+    clientColors[client] = getRandomColor();
+  }
+  return clientColors[client];
+}
+
+const getRandomColor = () => {
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
 }
 </script>
 

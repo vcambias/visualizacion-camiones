@@ -9,6 +9,10 @@ import TripSelector from './components/TripSelector.vue'
 
 <script>
 const containerSize = ref({ width: 0, height: 0, depth: 0 })
+const tripId = ref(0)
+const truckName = ref("")
+const tripWeight = ref(0)
+const tripClients = ref([])
 const loads = ref([])
 const loadClicked = ref(null)
 const renderKey = ref(0)
@@ -18,6 +22,10 @@ function handleLoadClick(data){
 }
 
 function handleTripSelected(data){
+  tripId.value = data.tripId
+  truckName.value = data.truckName
+  tripWeight.value = data.weight
+  tripClients.value = data.clients
   containerSize.value = data.containerSize
   loads.value = data.loads
   handleLoadClick([])
@@ -33,7 +41,7 @@ function handleTripSelected(data){
         <TripSelector @trip-selected="handleTripSelected"/>
       </div>
       <div id="Info">
-        <TruckCard :containerSize="containerSize" />
+        <TruckCard :tripData="{value: {tripId: tripId, truckType: truckName, totalWeight: tripWeight, clients: tripClients}}" />
         <LoadCard :loadClicked="loadClicked" />
       </div>
     </div>

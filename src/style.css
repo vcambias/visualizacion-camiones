@@ -35,6 +35,11 @@ h1 {
   line-height: 1.1;
 }
 
+ul{
+  margin: 0;
+  list-style-type: none;
+}
+
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -85,8 +90,6 @@ button:focus-visible {
   font-weight: 500;
   font-family: monospace;
   background-color: #f9f9f9;
-  text-align: justify;
   width: max-content;
-  text-align-last: justify;
   margin-bottom: 10px;
 }
