@@ -15,7 +15,6 @@ let lines = []
 let selectedLoad = ref(null)
 
 const getLines = () => {
-  //Container
   let containerVertices = [
         [0,0,0],
         [CONTAINER_SIZE.width,0,0],
@@ -46,7 +45,6 @@ const getLines = () => {
 }
 
 const getLoadLines = () => {
-  //Loads
   let loadLines = reactive(loads.map(load => {
     let vertices = [
       [load.ini_x, load.ini_y, load.ini_z],
@@ -88,23 +86,13 @@ const handleLoadClick = (load) => {
   selectedLoad.value = load
   emits('load-clicked', {loadClicked: load})
 }
-</script>
 
-<script>
-// const getRandomColor = () => {
-//   const letters = '0123456789ABCDEF'
-//   let color = '#'
-//   for (let i = 0; i < 6; i++) {
-//     color += letters[Math.floor(Math.random() * 16)]
-//   }
-//   return color
-// }
 </script>
 
 <template>
   <template v-if="CONTAINER_SIZE.width > 0">
     <TresCanvas clear-color="#ffffff" window-size>
-      <TresPerspectiveCamera :position="[CONTAINER_SIZE.width + 20, CONTAINER_SIZE.height + 10, CONTAINER_SIZE.depth + 40]"/>
+      <TresPerspectiveCamera :look-at="[0, 0, 0]" :position="[CONTAINER_SIZE.width + 20, CONTAINER_SIZE.height + 10, CONTAINER_SIZE.depth + 40]"/>
       <MapControls />
 
       <TresMesh :position="[CONTAINER_SIZE.width / 2, CONTAINER_SIZE.height / 2, CONTAINER_SIZE.depth / 2]">
@@ -118,10 +106,9 @@ const handleLoadClick = (load) => {
 
       <template v-for="(load, index) in loads" :key="index">
         <TresMesh :position="[(load.ini_x + load.fin_x) / 2, (load.ini_y + load.fin_y) / 2, (load.ini_z + load.fin_z) / 2]"
-        @click="() => handleLoadClick(load)"
-        :originalColor="load.originalColor">
+        @click="() => handleLoadClick(load)">
           <TresBoxGeometry :args="[load.fin_x - load.ini_x, load.fin_y - load.ini_y, load.fin_z - load.ini_z]"/>
-          <TresMeshBasicMaterial :color="load.color" :opacity="0.8" :transparent="true"/>
+          <TresMeshBasicMaterial :color="load.color" :opacity="selectedLoad === load ? 1 : 0.8" :transparent="selectedLoad === load ? false : true"/>
         </TresMesh>
 
         <template v-for="(loadLine, idx) in loadLines[index]" :key="idx">
