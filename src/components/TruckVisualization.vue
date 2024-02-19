@@ -1,6 +1,6 @@
 <script setup>
 import { TresCanvas } from '@tresjs/core'
-import {MapControls, Line2} from '@tresjs/cientos'
+import {CameraControls, Line2} from '@tresjs/cientos'
 import * as THREE from 'three'
 import { reactive, defineEmits, watchEffect } from 'vue'
 import { ref } from 'vue'
@@ -93,31 +93,32 @@ const handleLoadClick = (load) => {
 <template>
   <template v-if="CONTAINER_SIZE.width > 0">
     <TresCanvas clear-color="#ffffff" window-size>
-      <TresPerspectiveCamera :look-at="[0, 0, 0]" :position="[CONTAINER_SIZE.width + 20, CONTAINER_SIZE.height + 10, CONTAINER_SIZE.depth + 40]"/>
-      <MapControls />
+      <TresPerspectiveCamera :look-at="[0, 0, 0]" :position="[CONTAINER_SIZE.width, CONTAINER_SIZE.height + 20, CONTAINER_SIZE.depth]"/>
+      <CameraControls />
 
-      <TresMesh :position="[CONTAINER_SIZE.width / 2, CONTAINER_SIZE.height / 2, CONTAINER_SIZE.depth / 2]">
-        <TresBoxGeometry :args="[CONTAINER_SIZE.width, CONTAINER_SIZE.height, CONTAINER_SIZE.depth]"/>
-        <TresMeshBasicMaterial :color="'#808080'" :opacity="0.25" :transparent="true" :side="THREE.DoubleSide" :depthTest="false" />   
-      </TresMesh>
-
-      <template v-for="(line, index) in lines" :key="index">
-        <Line2 :points="[line.start.toArray(), line.end.toArray()]" :line-width="2" color="#5A5A5A" />
-      </template>
-
-      <template v-for="(load, index) in loads" :key="index">
-        <TresMesh :position="[(load.ini_x + load.fin_x) / 2, (load.ini_y + load.fin_y) / 2, (load.ini_z + load.fin_z) / 2]"
-        @click="() => handleLoadClick(load)">
-          <TresBoxGeometry :args="[load.fin_x - load.ini_x, load.fin_y - load.ini_y, load.fin_z - load.ini_z]"/>
-          <TresMeshBasicMaterial :color="load.color" :opacity="selectedLoad === load ? 1 : 0.8" :transparent="selectedLoad === load ? false : true"/>
+      <TresGroup :position="[-CONTAINER_SIZE.width / 2, 3, -CONTAINER_SIZE.depth / 2]">
+        <TresMesh :position="[CONTAINER_SIZE.width / 2, CONTAINER_SIZE.height / 2, CONTAINER_SIZE.depth / 2]">
+          <TresBoxGeometry :args="[CONTAINER_SIZE.width, CONTAINER_SIZE.height, CONTAINER_SIZE.depth]"/>
+          <TresMeshBasicMaterial :color="'#808080'" :opacity="0.25" :transparent="true" :side="THREE.DoubleSide" :depthTest="false" />   
         </TresMesh>
 
-        <template v-for="(loadLine, idx) in loadLines[index]" :key="idx">
-          <Line2 :points="[loadLine.start.toArray(), loadLine.end.toArray()]" :line-width="2" :color="loadLine.color" />
+        <template v-for="(line, index) in lines" :key="index">
+          <Line2 :points="[line.start.toArray(), line.end.toArray()]" :line-width="2" color="#5A5A5A" />
         </template>
-      </template>
 
-      <TresGridHelper :args="[CONTAINER_SIZE.depth * 2, CONTAINER_SIZE.width]" />
+        <template v-for="(load, index) in loads" :key="index">
+          <TresMesh :position="[(load.ini_x + load.fin_x) / 2, (load.ini_y + load.fin_y) / 2, (load.ini_z + load.fin_z) / 2]"
+          @click="() => handleLoadClick(load)">
+            <TresBoxGeometry :args="[load.fin_x - load.ini_x, load.fin_y - load.ini_y, load.fin_z - load.ini_z]"/>
+            <TresMeshBasicMaterial :color="load.color" :opacity="selectedLoad === load ? 1 : 0.8" :transparent="selectedLoad === load ? false : true"/>
+          </TresMesh>
+
+          <template v-for="(loadLine, idx) in loadLines[index]" :key="idx">
+            <Line2 :points="[loadLine.start.toArray(), loadLine.end.toArray()]" :line-width="2" :color="loadLine.color" />
+          </template>
+        </template>
+      </TresGroup>
+      <TresGridHelper :args="[CONTAINER_SIZE.depth,CONTAINER_SIZE.width]" :colorCenterLine="'#000000'" />
     </TresCanvas>
   </template>
 
