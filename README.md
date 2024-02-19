@@ -1,5 +1,9 @@
 # Truck Load Display 🚚
 
+## Descripción de la Aplicación
+
+La aplicación es una herramienta de visualización tridimensional (3D) desarrollada utilizando Vue.js, Vite y la librería three.js para Javascript. Está diseñada para cargar y mostrar representaciones en 3D de camiones y sus cargas asociadas. El usuario puede cargar datos desde un archivo CSV, que contiene información sobre las dimensiones del camión, las características de las cargas y detalles sobre los viajes.
+
 ## Instalación
 
 ### Node.js
