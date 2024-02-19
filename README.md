@@ -17,6 +17,7 @@ Instalar VSCode de [code.visualstudio.com](https://code.visualstudio.com/Downloa
 Ejecutar los siguientes comandos en la terminal:
 
 ```bash
+npm install
 npm install vite --proxy http://10.220.51.116:8080
 npm install vue --proxy http://10.220.51.116:8080
 npm install @tresjs/cientos --proxy http://10.220.51.116:8080/
@@ -45,6 +46,8 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
 
 ### Carga de Datos
 
+![Imagen de la app](/Capturas/1.png)
+
 Con el botón `Load File` se abre el explorador de archivos, permitiendo la carga de un **.csv** conteniendo la configuración de uno o varios viajes. Este archivo debe contener las siguientes columnas en el mismo orden que son listadas:
 1. Material
 2. Inicia_x
@@ -64,9 +67,17 @@ Con el botón `Load File` se abre el explorador de archivos, permitiendo la carg
 16. Distancia
 17. Peso
 
+![Imagen de la app](/Capturas/2.png)
+
 ### Selección de Viaje
 
 Una vez cargado el archivo con ese formato, seleccionar el número de viaje a visualizar en `Select Trip`.
+
+![Imagen de la app](/Capturas/3.png)
+
+Una vez seleccionado el viaje, se podrá visualizar en 3D el camión y sus cargas, junto con información sobre el viaje, el camión y cada carga particular.
+
+![Imagen de la app](/Capturas/4.png)
 
 ### Interacciones
 
