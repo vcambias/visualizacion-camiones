@@ -68,7 +68,8 @@ const getLoadLines = () => {
       let end = vertices[endIdx]
       return {
         start: new THREE.Vector3(...start),
-        end: new THREE.Vector3(...end)
+        end: new THREE.Vector3(...end),
+        color: load.fragility === "DELICADO" ? '#ffffff' : '#000000'
       }
     })
   }))
@@ -112,7 +113,7 @@ const handleLoadClick = (load) => {
         </TresMesh>
 
         <template v-for="(loadLine, idx) in loadLines[index]" :key="idx">
-          <Line2 :points="[loadLine.start.toArray(), loadLine.end.toArray()]" :line-width="2" color="#000000" />
+          <Line2 :points="[loadLine.start.toArray(), loadLine.end.toArray()]" :line-width="2" :color="loadLine.color" />
         </template>
       </template>
 

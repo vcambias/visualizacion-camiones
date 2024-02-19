@@ -84,13 +84,13 @@ const processData = (data) => {
         fragility: loadInfo[12],
         prod_type: loadInfo[13],
         locality: loadInfo[14],
-        distance: loadInfo[15],
+        distance: parseFloat(loadInfo[15].replace(',','.')).toFixed(2),
         weight: parseFloat(loadInfo[16]),
         color: getClientColor(loadInfo[10]),
       };
 
     currentContainerWeight += load.weight
-    currentContainerClients.some((client) => client.clientName === load.client) || currentContainerClients.push({clientName: load.client, clientColor: getClientColor(load.client)})
+    currentContainerClients.some((client) => client.clientName === load.client) || currentContainerClients.push({clientName: load.client, clientColor: getClientColor(load.client), distance: load.distance})
     currentContainerLoads.push(load)
   }
 

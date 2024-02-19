@@ -31,10 +31,8 @@ export default {
         <div>Client: {{ loadData.client }}</div>   
       </div>
       <div>Order N° {{ loadData.order }}</div>
-      <div>Fragility: {{ loadData.fragility }}</div>
       <div>Product Type: {{ loadData.prod_type }}</div>
-      <div>Locality: {{ loadData.locality }}</div>
-      <div>Distance: {{ loadData.distance }}</div>
+      <div>Destination Location: {{ loadData.locality }}</div>
     </div>
 
     <div v-else>

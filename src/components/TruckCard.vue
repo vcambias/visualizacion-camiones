@@ -31,7 +31,7 @@ export default {
           <svg width="10" height="10">
             <circle cx="5" cy="5" r="3" :fill="client.clientColor" />
           </svg> 
-          {{ client.clientName }}
+          {{ client.clientName }} ({{ client.distance }} km)
         </li>
       </ul>
     </div>
