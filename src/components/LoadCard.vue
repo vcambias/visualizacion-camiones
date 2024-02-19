@@ -47,5 +47,6 @@ export default {
 #Client{
   display: flex !important;
   align-items: center !important;
+  justify-content: flex-end !important;
 }
 </style>
