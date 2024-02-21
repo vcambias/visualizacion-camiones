@@ -13,6 +13,7 @@ let loads = reactive([])
 let loadLines = []
 let lines = []
 let selectedLoad = ref(null)
+let pointedLoad = ref(null)
 
 const getLines = () => {
   let containerVertices = [
@@ -88,6 +89,15 @@ const handleLoadClick = (load) => {
   emits('load-clicked', {loadClicked: load})
 }
 
+const onPointerEnter = (intersection) => {
+  pointedLoad.value = intersection
+  intersection.object.material.opacity = 1
+  console.log(intersection)
+}
+
+const onPointerLeave = () => {
+ pointedLoad.value.object.material.opacity = 0.8
+}
 </script>
 
 <template>
@@ -108,7 +118,10 @@ const handleLoadClick = (load) => {
 
         <template v-for="(load, index) in loads" :key="index">
           <TresMesh :position="[(load.ini_x + load.fin_x) / 2, (load.ini_y + load.fin_y) / 2, (load.ini_z + load.fin_z) / 2]"
-          @click="() => handleLoadClick(load)">
+          @click="() => handleLoadClick(load)"
+          @pointer-enter="(intersection) => onPointerEnter(intersection)"
+          @pointer-leave="() => onPointerLeave()"
+          >
             <TresBoxGeometry :args="[load.fin_x - load.ini_x, load.fin_y - load.ini_y, load.fin_z - load.ini_z]"/>
             <TresMeshBasicMaterial :color="load.color" :opacity="selectedLoad === load ? 1 : 0.8" :transparent="selectedLoad === load ? false : true"/>
           </TresMesh>
