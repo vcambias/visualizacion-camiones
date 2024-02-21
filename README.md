@@ -27,6 +27,7 @@ npm install vue --proxy http://10.220.51.116:8080
 npm install @tresjs/cientos --proxy http://10.220.51.116:8080/
 npm install @tresjs/core three --proxy http://10.220.51.116:8080/  
 npm install three --proxy http://10.220.51.116:8080
+npm i vue-chartjs chart.js --proxy http://10.220.51.116:8080
 ```
 
 ### Iniciar el Servidor de Desarrollo

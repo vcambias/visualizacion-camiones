@@ -5,6 +5,7 @@ import { ref } from 'vue'
 import TruckCard from './components/TruckCard.vue'
 import LoadCard from './components/LoadCard.vue'
 import TripSelector from './components/TripSelector.vue'
+import TripStatsCard from './components/TripStatsCard.vue'
 </script>
 
 <script>
@@ -16,6 +17,7 @@ const tripClients = ref([])
 const loads = ref([])
 const loadClicked = ref(null)
 const renderKey = ref(0)
+const tripVolume = ref(0)
 
 function handleLoadClick(data){
   loadClicked.value = data.loadClicked
@@ -30,6 +32,7 @@ function handleTripSelected(data){
   loads.value = data.loads
   handleLoadClick([])
   renderKey.value += 1
+  tripVolume.value = data.volume
 }
 </script>
 
@@ -39,9 +42,10 @@ function handleTripSelected(data){
     <div id="Overlapping">
       <div id="Selector">
         <TripSelector @trip-selected="handleTripSelected"/>
+        <TripStatsCard :tripStats="{value: {truckName: truckName, clients: tripClients, volume: tripVolume, weight: tripWeight}}"></TripStatsCard>
       </div>
       <div id="Info">
-        <TruckCard :tripData="{value: {tripId: tripId, truckType: truckName, totalWeight: tripWeight, clients: tripClients}}" />
+        <TruckCard :tripData="{value: {tripId: tripId, truckType: truckName, totalWeight: tripWeight, totalVolume: tripVolume, clients: tripClients}}" />
         <LoadCard :loadClicked="loadClicked" />
       </div>
     </div>

@@ -11,8 +11,10 @@
   "dependencies": {
     "@tresjs/cientos": "^3.8.0",
     "@tresjs/core": "^3.7.0",
+    "chart.js": "^4.4.1",
     "three": "^0.161.0",
-    "vue": "^3.3.11"
+    "vue": "^3.3.11",
+    "vue-chartjs": "^5.3.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.5.2",

@@ -1,5 +1,6 @@
 <script>
 import { ref, watch } from 'vue'
+import * as TruckSizes from '../data/TruckSizes.js'
 
 export default {
   props: {
@@ -7,13 +8,15 @@ export default {
   },
   setup(props) {
     const tripData = ref(null)
+    const truckSizes = TruckSizes.truckSizes
 
     watch(() => {
       tripData.value = props.tripData
     })
 
     return {
-      tripData
+      tripData,
+      truckSizes
     }
   }
 }
@@ -23,8 +26,9 @@ export default {
   <div class="card" id="TruckCard">
     <div v-if="tripData.value.clients.length > 0">
       <div>Trip N° {{ tripData.value.tripId }}</div>
+
       <div>Truck Type: {{ tripData.value.truckType }}</div>
-      <div>Total Weight: {{ tripData.value.totalWeight }}</div>
+      
       <div>Clients:</div>
       <ul>
         <li v-for="client in tripData.value.clients" :key="client.clientName">

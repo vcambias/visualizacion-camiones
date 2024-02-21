@@ -124,7 +124,7 @@ const handleLoadClick = (load) => {
 
   <template v-else>
     <div id="message">
-      Nothing to see. Load file and select trip to continue.
+      Nothing to see. Load file and select trip to continue. 
     </div>
   </template>
 

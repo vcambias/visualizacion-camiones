@@ -33,6 +33,7 @@ const processData = (data) => {
   const lines = data.split('\n')
   let currentContainerLoads = []
   let currentContainerWeight = 0
+  let currentContainerVolume = 0
   let currentContainerClients = []
 
   let currentTripId = 0
@@ -58,7 +59,8 @@ const processData = (data) => {
           tripId: parseFloat(lastTripId),
           containerSize: lastTruckSizes,
           clients: currentContainerClients,
-          weight: currentContainerWeight,
+          weight: currentContainerWeight.toFixed(2),
+          volume: currentContainerVolume,
           loads: currentContainerLoads,
           truckName: lastTruckName
         }
@@ -67,6 +69,7 @@ const processData = (data) => {
         currentContainerLoads = []
         currentContainerClients = []
         currentContainerWeight = 0
+        currentContainerVolume = 0
       }
     }
 
@@ -85,12 +88,28 @@ const processData = (data) => {
         prod_type: loadInfo[13],
         locality: loadInfo[14],
         distance: parseFloat(loadInfo[15].replace(',','.')).toFixed(2),
-        weight: parseFloat(loadInfo[16]),
-        color: getClientColor(loadInfo[10]),
+        weight: parseFloat(loadInfo[16].replace(',','.')).toFixed(2)/1,
+        color: getClientColor(loadInfo[10])
       };
+      load.volume = calculateVolume(load)
 
     currentContainerWeight += load.weight
-    currentContainerClients.some((client) => client.clientName === load.client) || currentContainerClients.push({clientName: load.client, clientColor: getClientColor(load.client), distance: load.distance})
+    currentContainerVolume += load.volume
+
+    const existingClient = currentContainerClients.find((client) => client.clientName === load.client);
+    if (!existingClient) {
+      currentContainerClients.push({
+        clientName: load.client,
+        clientColor: getClientColor(load.client),
+        distance: load.distance,
+        volume: load.volume,
+        weight: load.weight
+      });
+    } else {
+      existingClient.volume += load.volume;
+      existingClient.weight += load.weight;
+    }
+
     currentContainerLoads.push(load)
   }
 
@@ -98,7 +117,8 @@ const processData = (data) => {
     tripId: parseFloat(lastTripId),
     containerSize: lastTruckSizes,
     clients: currentContainerClients,
-    weight: currentContainerWeight,
+    weight: currentContainerWeight.toFixed(2),
+    volume: currentContainerVolume,
     loads: currentContainerLoads,
     truckName: lastTruckName
   }
@@ -121,6 +141,13 @@ const getRandomColor = () => {
   }
   return color;
 }
+
+const calculateVolume = (load) => {
+  const length = Math.abs(load.fin_x - load.ini_x)/10;
+  const width = Math.abs(load.fin_y - load.ini_y)/10;
+  const height = Math.abs(load.fin_z - load.ini_z)/10;
+  return (length * width * height).toFixed(2) / 1;
+};
 </script>
 
 <template>
