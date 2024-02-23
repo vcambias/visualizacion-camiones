@@ -1,5 +1,5 @@
 <script>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch } from 'vue'
 import { Doughnut } from 'vue-chartjs'
 import * as TruckSizes from '../data/TruckSizes.js'
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
@@ -36,12 +36,10 @@ export default {
       }
 
       if (this.tripStats.value && this.tripStats.value.clients.length > 0) {
-          // Actualizar datos para el gráfico de peso
           weightChartData.labels = this.tripStats.value.clients.map(client => client.clientName);
           weightChartData.datasets[0].data = this.tripStats.value.clients.map(client => client.weight);
           weightChartData.datasets[0].backgroundColor = this.tripStats.value.clients.map(client => client.clientColor);
 
-          // Calcular espacio libre para el gráfico de peso
           const totalWeight = parseFloat(TruckSizes.truckSizes[this.tripStats.value.truckName].max_weight);
           const usedWeight = this.tripStats.value.clients.reduce((total, client) => total + parseFloat(client.weight), 0);
           const freeWeight = totalWeight - usedWeight;
@@ -64,12 +62,10 @@ export default {
       }
 
       if (this.tripStats.value && this.tripStats.value.clients.length > 0) {
-          // Actualizar datos para el gráfico de peso
           volumeChartData.labels = this.tripStats.value.clients.map(client => client.clientName);
           volumeChartData.datasets[0].data = this.tripStats.value.clients.map(client => client.volume);
           volumeChartData.datasets[0].backgroundColor = this.tripStats.value.clients.map(client => client.clientColor);
 
-          // Calcular espacio libre para el gráfico de peso
           const totalVolume = parseFloat(TruckSizes.truckSizes[this.tripStats.value.truckName].volume);
           const usedVolume = this.tripStats.value.clients.reduce((total, client) => total + parseFloat(client.volume), 0);
           const freeVolume = totalVolume - usedVolume;
@@ -81,6 +77,20 @@ export default {
 
       return volumeChartData;
     },
+
+    options(){
+      const options = {
+        plugins: {
+            legend: {
+                display: false,
+                labels: {
+                    color: 'rgb(255, 99, 132)'
+                }
+            }
+        }
+    }
+    return options;
+    }
 }}
 </script>
 
@@ -90,12 +100,12 @@ export default {
         <h3>Trip Weight: {{ tripStats.value.weight }} t</h3>
         <h4>Max Weight: {{ truckSizes[this.tripStats.value.truckName].max_weight }} t</h4>
         <h5><i>Occupancy rate: ({{ (tripStats.value.weight * 100 / (truckSizes[this.tripStats.value.truckName]).max_weight).toFixed(2) }} %)</i></h5>
-        <Doughnut class="chart" :data="weightChartData"/>
+        <Doughnut class="chart" :data="weightChartData" :options="options"/>
         
         <h3>Trip Volume: {{ (tripStats.value.volume).toFixed(2) }} m³</h3>
         <h4>Max Volume: {{ ((truckSizes[this.tripStats.value.truckName]).volume).toFixed(2) }} m³</h4>
         <h5><i>Occupancy rate: ({{ (tripStats.value.volume * 100 / (truckSizes[this.tripStats.value.truckName]).volume).toFixed(2) }} %)</i></h5>
-        <Doughnut class="chart" :data="volumeChartData"/>
+        <Doughnut class="chart" :data="volumeChartData" :options="options"/>
     </div>
 
     <div v-else>
@@ -107,8 +117,8 @@ export default {
 <style>
 .chart{
   position: relative !important;
-  height: 200px !important;
-  width: 200px !important;
+  height: 175px !important;
+  width: 175px !important;
 }
 h3,h4,h5{
   margin: 1px;

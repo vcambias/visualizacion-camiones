@@ -6,6 +6,7 @@ import TruckCard from './components/TruckCard.vue'
 import LoadCard from './components/LoadCard.vue'
 import TripSelector from './components/TripSelector.vue'
 import TripStatsCard from './components/TripStatsCard.vue'
+import LevelFilter from './components/LevelFilter.vue'
 </script>
 
 <script>
@@ -17,7 +18,10 @@ const tripClients = ref([])
 const loads = ref([])
 const loadClicked = ref(null)
 const renderKey = ref(0)
+const renderKeyLevel = ref(0)
 const tripVolume = ref(0)
+const max_level = ref(0)
+const levelsHidden = ref([])
 
 function handleLoadClick(data){
   loadClicked.value = data.loadClicked
@@ -32,16 +36,28 @@ function handleTripSelected(data){
   loads.value = data.loads
   handleLoadClick([])
   renderKey.value += 1
+  renderKeyLevel.value += 1
   tripVolume.value = data.volume
+  max_level.value = data.max_level
+  levelsHidden.value = []
+}
+
+function handleLevelChange(data){
+  levelsHidden.value = data.selectedValues
+  handleLoadClick([])
+  renderKey.value += 1
 }
 </script>
 
 <template>
-    <FileLoader id="FileLoader" />
-    <TruckVisualization :key="renderKey" :containerSize="containerSize" :loads="loads" @load-clicked="handleLoadClick"/>
+    <div id="Control">
+      <FileLoader />
+      <TripSelector @trip-selected="handleTripSelected"/>
+      <LevelFilter :key="renderKeyLevel" @level-change="handleLevelChange" :levelsInfo="{value: {levelsHidden: levelsHidden, max_level: max_level}}"/>
+    </div>
+    <TruckVisualization :key="renderKey" :containerSize="containerSize" :loads="loads" :levelsHidden="levelsHidden" @load-clicked="handleLoadClick"/>
     <div id="Overlapping">
-      <div id="Selector">
-        <TripSelector @trip-selected="handleTripSelected"/>
+      <div id="Stats">
         <TripStatsCard :tripStats="{value: {truckName: truckName, clients: tripClients, volume: tripVolume, weight: tripWeight}}"></TripStatsCard>
       </div>
       <div id="Info">
@@ -53,7 +69,11 @@ function handleTripSelected(data){
 
 <style>
 html,
-#FileLoader {
+#Control {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: baseline;
   position: relative;
   z-index: 1;
   font-family: monospace;
@@ -67,7 +87,7 @@ html,
   padding: 10px;
   text-align: -webkit-right;
 }
-#Selector{
+#Stats{
   position: relative;
   z-index: 2;
   text-align-last: left;

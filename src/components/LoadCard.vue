@@ -32,6 +32,9 @@ export default {
       </div>
       <div>Order N° {{ loadData.order }}</div>
       <div>Product Type: {{ loadData.prod_type }}</div>
+      <div>Item: {{ loadData.item }}</div>
+      <div>Package Width: {{ (loadData.width/1000).toFixed(2) }} m</div>
+      <div>Package Height: {{ (loadData.height/1000).toFixed(2) }} m</div>
       <div>Destination Location: {{ loadData.locality }}</div>
     </div>
 
@@ -46,5 +49,8 @@ export default {
   display: flex !important;
   align-items: center !important;
   justify-content: flex-end !important;
+}
+svg{
+  margin-right: 6px;
 }
 </style>

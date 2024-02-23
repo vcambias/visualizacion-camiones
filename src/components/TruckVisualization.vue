@@ -5,7 +5,7 @@ import * as THREE from 'three'
 import { reactive, defineEmits, watchEffect } from 'vue'
 import { ref } from 'vue'
 
-const props = defineProps(['containerSize', 'loads'])
+const props = defineProps(['containerSize', 'loads', 'levelsHidden'])
 const emits = defineEmits()
 
 let CONTAINER_SIZE = reactive({ width: 0, height: 0, depth: 0 })
@@ -14,6 +14,7 @@ let loadLines = []
 let lines = []
 let selectedLoad = ref(null)
 let pointedLoad = ref(null)
+let levelsHidden = reactive([])
 
 const getLines = () => {
   let containerVertices = [
@@ -82,6 +83,7 @@ watchEffect(() => {
   loads = [...props.loads]
   loadLines = getLoadLines()
   lines = getLines()
+  levelsHidden = [...props.levelsHidden]
 })
 
 const handleLoadClick = (load) => {
@@ -92,7 +94,6 @@ const handleLoadClick = (load) => {
 const onPointerEnter = (intersection) => {
   pointedLoad.value = intersection
   intersection.object.material.opacity = 1
-  console.log(intersection)
 }
 
 const onPointerLeave = () => {
@@ -113,22 +114,25 @@ const onPointerLeave = () => {
         </TresMesh>
 
         <template v-for="(line, index) in lines" :key="index">
-          <Line2 :points="[line.start.toArray(), line.end.toArray()]" :line-width="2" color="#5A5A5A" />
+          <Line2 :transparent="true" :opacity="0.25" :points="[line.start.toArray(), line.end.toArray()]" :line-width="2" color="#5A5A5A" />
         </template>
+        
+        <template v-for="(load, index) in loads" :key="index" :load-level="load.level">
+          <TresGroup v-if="!levelsHidden.includes(load.level)">
+            <TresMesh :position="[(load.ini_x + load.fin_x) / 2, (load.ini_y + load.fin_y) / 2, (load.ini_z + load.fin_z) / 2]"
+            @click="() => handleLoadClick(load)"
+            @pointer-enter="(intersection) => onPointerEnter(intersection)"
+            @pointer-leave="() => onPointerLeave()"
+            >
+              <TresBoxGeometry :args="[load.fin_x - load.ini_x, load.fin_y - load.ini_y, load.fin_z - load.ini_z]"/>
+              <TresMeshBasicMaterial :color="load.color" :opacity="selectedLoad === load ? 1 : 0.8" :transparent="selectedLoad === load ? false : true"/>
+            </TresMesh>
 
-        <template v-for="(load, index) in loads" :key="index">
-          <TresMesh :position="[(load.ini_x + load.fin_x) / 2, (load.ini_y + load.fin_y) / 2, (load.ini_z + load.fin_z) / 2]"
-          @click="() => handleLoadClick(load)"
-          @pointer-enter="(intersection) => onPointerEnter(intersection)"
-          @pointer-leave="() => onPointerLeave()"
-          >
-            <TresBoxGeometry :args="[load.fin_x - load.ini_x, load.fin_y - load.ini_y, load.fin_z - load.ini_z]"/>
-            <TresMeshBasicMaterial :color="load.color" :opacity="selectedLoad === load ? 1 : 0.8" :transparent="selectedLoad === load ? false : true"/>
-          </TresMesh>
-
-          <template v-for="(loadLine, idx) in loadLines[index]" :key="idx">
+            <template v-for="(loadLine, idx) in loadLines[index]" :key="idx">
             <Line2 :points="[loadLine.start.toArray(), loadLine.end.toArray()]" :line-width="2" :color="loadLine.color" />
           </template>
+          </TresGroup>
+          
         </template>
       </TresGroup>
       <TresGridHelper :args="[CONTAINER_SIZE.depth,CONTAINER_SIZE.width]" :colorCenterLine="'#000000'" />

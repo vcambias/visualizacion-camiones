@@ -53,7 +53,7 @@ const processData = (data) => {
     lastTruckName = currentTruckName;
     currentTruckName = loadInfo[8];
     
-    if(loadInfo[1] === '0' && loadInfo[2] === '0' && loadInfo[3] === '0'){
+    if(lastTripId != currentTripId){
       if(currentContainerLoads.length > 0){
         const trip = {
           tripId: parseFloat(lastTripId),
@@ -64,6 +64,7 @@ const processData = (data) => {
           loads: currentContainerLoads,
           truckName: lastTruckName
         }
+        trip.max_level = Math.max(...trip.loads.map(load => load.level))
 
         Trips.addTrip(trip);
         currentContainerLoads = []
@@ -89,7 +90,11 @@ const processData = (data) => {
         locality: loadInfo[14],
         distance: parseFloat(loadInfo[15].replace(',','.')).toFixed(2),
         weight: parseFloat(loadInfo[16].replace(',','.')).toFixed(2)/1,
-        color: getClientColor(loadInfo[10])
+        color: getClientColor(loadInfo[10]),
+        level: parseFloat(loadInfo[17]),
+        item: loadInfo[18],
+        width: loadInfo[19],
+        height: loadInfo[20],
       };
       load.volume = calculateVolume(load)
 
@@ -122,6 +127,7 @@ const processData = (data) => {
     loads: currentContainerLoads,
     truckName: lastTruckName
   }
+  trip.max_level = Math.max(...trip.loads.map(load => load.level))
 
   Trips.addTrip(trip);
 }
