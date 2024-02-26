@@ -71,6 +71,10 @@ Con el botón `Load File` se abre el explorador de archivos, permitiendo la carg
 15. Localidad
 16. Distancia
 17. Peso
+18. Nivel
+19. Item
+20. Ancho
+21. Alto
 
 ![Imagen de la app](/Capturas/2.png)
 
