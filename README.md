@@ -101,5 +101,8 @@ Se puede interactuar con la visualización del camión de las siguientes maneras
 
 Al hacer clic en una carga específica en el camión, puedes acceder a detalles adicionales sobre esa carga:
 
-- **Clic en la Carga:** Haz clic en una carga para ver información detallada, como el nombre del material, el tipo de producto, su fragilidad, etc.
+- **Clic en la Carga:** Haz clic en una carga para ver información detallada, como el nombre del material, el tipo de producto, su fragilidad (el borde de la carga es blanco), etc.
 
+#### Filtrado de Cargas por Nivel
+
+En el menú superior derecho `Nivel`, se pueden filtrar los niveles de cargas que se desean visualizar. Por defecto, todos los niveles son mostrados.
